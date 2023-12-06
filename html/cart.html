@@ -1,0 +1,176 @@
+<div class='row gx-5' id='cart'>
+    <div class='col-12 col-lg-8 mt-3' id='cart-list'></div>
+
+    <div class='col-12 col-lg-4 mt-3'>
+        <div class='row mt-3'>
+            <div class='col fw-bold'>Product</div>
+            <div class='col text-end' id='cart-total-product-price'></div>
+        </div>
+
+        <div class='row mt-3'>
+            <div class='col fw-bold'>Shipping Fee</div>
+            <div class='col text-end' id='cart-shipping-fee'></div>
+        </div>
+
+        <div class='row mt-3'>
+            <div class='col fw-bold'>Total</div>
+            <div class='col text-end' id='cart-total'></div>
+        </div>
+
+        <div class='row mt-3'>
+            <div class='col'>
+                <button class='btn btn-dark w-100'>Order</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    pageTitle.innerHTML = 'Cart';
+
+    showCart();
+
+    async function showCart() {
+        setCartValues('No product.', 0, 0);
+
+        const userId = getSessionLoginUserId();
+        if (!userId) {
+            alert('Please login to see your cart.');
+            return;
+        }
+
+        const cartItems = await dbGetCartItems(userId);
+
+        if (cartItems.length === 0) { return; }
+
+        let cartListValue = '';
+        let cartTotalValue = 0;
+
+        for (const cartItem of cartItems) {
+            const product = await dbGetProduct(cartItem.productId);
+
+            if (product) {
+                cartListValue += displayCartItem(cartItem, product);
+                cartTotalValue += product.price * cartItem.quantity;
+            }
+        }
+
+        setCartValues(cartListValue, cartTotalValue, 20000);
+    }
+
+    function removeCartItem(productId) {
+        const cartList = document.getElementById('cart-list');
+        const cartItem = document.getElementById(`cart-item-${productId}`);
+
+        cartList.removeChild(cartItem);
+    }
+
+    function displayCartItem(cartItem, product) {
+        return `
+        <div class='card mt-3 p-3 bg-light border-light' id='cart-item-${product.id}'>
+            <div class='row align-items-center'>
+                <div style='width: 75px;'>
+                    <img src='${product.image}' class='rounded' alt='${product.name} Image' height='75px' width='75px' style='object-fit: cover;'>
+                </div>
+
+                <div class='col ms-4'>
+                    <div class='row'>
+                        <div class='col-12 col-md-6'>
+                            <div class='fs-6 fw-bold mb-1'>${product.name}</div>
+                            <div class='fs-6'>${formatCurrency(product.price)}</div>
+                        </div>
+
+                        <div class='col-12 col-md-6 text-md-end'>
+                            <div class='row'>
+                                <div class='col-6 col-md-12 fs-6 fw-bold text-body-emphasis mt-2 mt-md-0 mb-1'>
+                                    ${formatCurrency(product.price * cartItem.quantity)}
+                                </div>
+
+                                <div class='col-6 col-md-12 d-flex justify-content-end'>
+                                    <div class='input-group input-group-sm' style='width: 95px;'>
+                                        <button class='input-group-text' style='width: 25px;' onclick='decreaseQuantity("${product.id}");'>
+                                            -
+                                        </button>
+
+                                        <input type='number' class='form-control text-center' value='${cartItem.quantity}' id='cart-item-quantity-${product.id}' readonly>
+
+                                        <button class='input-group-text' style='width: 25px;' onclick='increaseQuantity("${product.id}");'>
+                                            +
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function setCartValues(cartListValue, cartTotalValue, cartShippingFeeValue) {
+        const cartList = document.getElementById('cart-list');
+        const cartTotal = document.getElementById('cart-total');
+        const cartShippingFee = document.getElementById('cart-shipping-fee');
+        const cartTotalProductPrice = document.getElementById('cart-total-product-price');
+
+        cartList.innerHTML = cartListValue;
+
+        cartTotalProductPrice.innerHTML = formatCurrency(cartTotalValue);
+        cartShippingFee.innerHTML = formatCurrency(cartShippingFeeValue);
+        cartTotal.innerHTML = formatCurrency(cartTotalValue + cartShippingFeeValue);
+    }
+
+    function increaseQuantity(productId) {
+        changeQuantity(productId, 1);
+    }
+
+    function decreaseQuantity(productId) {
+        changeQuantity(productId, -1);
+    }
+
+    function changeQuantity(productId, value) {
+        const quantityInput = document.getElementById(`cart-item-quantity-${productId}`);
+
+        const userId = getSessionLoginUserId();
+        const oldQuantity = parseInt(quantityInput.value);
+        const newQuantity = oldQuantity + value;
+
+        const oldCartItem = {
+            productId: productId,
+            quantity: oldQuantity,
+        };
+
+        const newCartItem = {
+            productId: productId,
+            quantity: newQuantity,
+        };
+
+        if (newQuantity === 0) {
+            const isDeleteConfirm = confirm('Are you sure you want to remove this product from your cart?');
+
+            if (!isDeleteConfirm)
+                return;
+
+            const isRemoved = dbRemoveCartItem(userId, oldCartItem);
+
+            if (isRemoved) {
+                changeMenuCartTotal(value);
+                removeCartItem(productId);
+                return;
+            }
+
+            alert('Failed to remove product. Please try again.');
+            return;
+        }
+
+        const isCartItemUpdated = dbChangeCartItemQuantity(userId, oldCartItem, newCartItem);
+
+        if (isCartItemUpdated) {
+            changeMenuCartTotal(value);
+            quantityInput.value = newQuantity;
+            return;
+        }
+
+        alert('Failed to change quantity. Please try again.');
+    }
+</script>

@@ -1,0 +1,16 @@
+<div id='product'>
+    <div class='row' id='product-list'></div>
+</div>
+
+<script>
+    pageTitle.innerHTML = 'Products';
+
+    showAllProducts();
+
+    async function showAllProducts() {
+        const productList = document.getElementById('product-list');
+        const products = await dbGetProducts();
+
+        displayProducts(productList, products);
+    }
+</script>

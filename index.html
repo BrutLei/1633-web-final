@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+
+    <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css' rel='stylesheet'
+        integrity='sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN' crossorigin='anonymous'>
+    <link rel='stylesheet' href='css/style.css'>
+
+    <script src='https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js'></script>
+    <script src='https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js'></script>
+    <script src='https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js'></script>
+
+    <script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js'
+        integrity='sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL'
+        crossorigin='anonymous'></script>
+
+    <script src='js/common.js'></script>
+    <script src='js/product.js'></script>
+    <script src='js/database.js'></script>
+
+    <title id='page-title'>Home</title>
+    <style>
+        .carousel-inner img {
+            margin: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class='navbar navbar-expand-lg bg-primary bg-gradient sticky-top' data-bs-theme='dark'>
+        <div class='container-fluid'>
+            <a class='navbar-brand' href='index.html'>
+                <div class='d-flex align-items-center'>
+                    <img src='img/wood-logo.png' alt='Boy Scout Logo' height='60px'>&nbsp;&nbsp;Marches WoodShell
+                </div>
+            </a>
+
+            <button class='navbar-toggler' type='button' data-bs-toggle='collapse'
+                data-bs-target='#navbarSupportedContent' aria-controls='navbarSupportedContent' aria-expanded='false'
+                aria-label='Toggle navigation'>
+                <span class='navbar-toggler-icon'></span>
+            </button>
+
+            <div class='collapse navbar-collapse' id='navbarSupportedContent'>
+                <ul class='navbar-nav me-auto mb-2 mb-lg-0'>
+                    <li class='nav-item active'>
+                        <a class='nav-link' href='#' id='menu-home'>Home</a>
+                    </li>
+
+                    <li class='nav-item'>
+                        <a class='nav-link' href='#' id='menu-product'>Product</a>
+                    </li>
+
+                    <li class='nav-item dropdown'>
+                        <a class='nav-link dropdown-toggle' href='#' role='button' data-bs-toggle='dropdown'
+                            aria-expanded='false'>
+                            Admin
+                        </a>
+
+                        <ul class='dropdown-menu bg-primary bg-gradient'>
+                            <li>
+                                <a class='dropdown-item' href='#' id='menu-add-product'>
+                                    Add Product
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <ul class='d-flex navbar-nav mb-2 mb-lg-0'>
+                    <li class='nav-item'>
+                        <a class='nav-link d-flex align-items-center btn btn-info' href='#' id='menu-cart'>
+                            Cart&nbsp;&nbsp;<span class='badge bg-light text-secondary' id='menu-cart-total'
+                                style='pointer-events: none;'></span>
+                        </a>
+                    </li>
+
+                    <li class='nav-item'>
+                        <a class='nav-link' href='#' id='menu-login'>Login</a>
+                    </li>
+
+                    <li class='nav-item'>
+                        <a class='nav-link' href='#' id='menu-profile'></a>
+                    </li>
+
+                    <li class='nav-item'>
+                        <a class='nav-link' href='#' id='menu-logout'>Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- End Navigation Bar -->
+
+    <!-- Main Content -->
+    <div class='content mt-2'>
+        <div class='container' id='page-content'></div>
+    </div>
+    <!-- End Main Content -->
+
+    <!-- Footer -->
+    <footer class='footer p-4 mt-5 border-top text-secondary row'>
+        <div class='col'>
+            <div class='d-flex align-items-center mb-2'>
+                <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor'
+                    class='bi bi-telephone' viewBox='0 0 16 16'>
+                    <path
+                        d='M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.482 8.062a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z' />
+                </svg>
+                &nbsp;&nbsp;
+                <a href='tel:+84962242999' class='link-secondary link-offset-2 link-underline link-underline-opacity-0'>
+                    +8496-2242-999
+                </a>
+            </div>
+
+            <div class='d-flex align-items-center mb-2'>
+                <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor'
+                    class='bi bi-envelope' viewBox='0 0 16 16'>
+                    <path
+                        d='M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z' />
+                </svg>
+                &nbsp;&nbsp;
+                <a href='mailto:phathhgcs200605@fpt.edu.v'
+                    class='link-secondary link-offset-2 link-underline link-underline-opacity-0'>
+                    phathhgcs200605@fpt.edu.vn
+                </a>
+            </div>
+        </div>
+
+        <div class='col d-flex align-items-top justify-content-end'>
+            &copy;&nbsp;&nbsp;2023 MWS
+        </div>
+    </footer>
+    <!-- End Footer -->
+
+    <!-- Javascript -->
+    <script src='js/navigation.js'></script>
+    <script src='js/cart.js'></script>
+    <script src='js/index.js'></script>
+    <!-- End Javascript -->
+</body>
+
+</html>

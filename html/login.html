@@ -1,0 +1,56 @@
+<div class='d-flex justify-content-center' id='login'>
+    <form class='col-12 col-md-6' id='frm-login'>
+        <div class='mt-3' id='frm-login-validation'></div>
+
+        <div class='form-floating mt-3'>
+            <input type='email' class='form-control' id='frm-login-email' placeholder='Email' required>
+            <label for='frm-login-email' id='lbl-email'>Email *</label>
+        </div>
+
+        <div class='form-floating mt-3'>
+            <input type='password' class='form-control' id='frm-login-password' placeholder='Password' required>
+            <label for='frm-login-password'>Password *</label>
+        </div>
+
+        <div class='mt-3 text-end'>
+            <a href='#'>Forgot password?</a>
+        </div>
+
+        <div class='text-center mt-3'>
+            <button class='btn btn-success' type='submit'>
+                Login
+            </button>
+
+            <a class='btn btn-primary' id='link-register'>Register</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    pageTitle.innerHTML = 'Login';
+
+    $('#frm-login').submit(login);
+    $('#link-register').on('click', navigate);
+
+    async function login(event) {
+        event.preventDefault();
+
+        const validationId = 'frm-login-validation';
+
+        const email = document.getElementById('frm-login-email').value;
+        const password = document.getElementById('frm-login-password').value;
+
+        await dbAuthenticate(email, password)
+            .then((user) => {
+                hideLoginMenu();
+                setSessionLoginUser(user);
+                displayMenuCartTotal();
+
+                alert('Login success.');
+                loadPage('product');
+            })
+            .catch((error) => {
+                displayValidationError(validationId, 'Login fail.');
+            });
+    }
+</script>

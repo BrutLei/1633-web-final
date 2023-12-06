@@ -1,0 +1,29 @@
+/* Chrome, Safari, Edge, Opera */
+#cart input::-webkit-outer-spin-button,
+#cart input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+#cart input[type=number] {
+    -moz-appearance: textfield;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.content {
+    flex: 1;
+}
+
+.footer {
+    flex-shrink: 0;
+}
